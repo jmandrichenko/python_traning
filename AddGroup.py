@@ -8,9 +8,27 @@ from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re
 
 
+ProxyHost = "54.84.95.51"
+ProxyPort = "8083"
+
+
+class ProxyCh(webdriver.FirefoxProfile):
+
+    def ChangeProxy(self, ProxyHost, ProxyPort):
+        self.profile = webdriver.FirefoxProfile()
+        profile = self.profile
+        profile.set_preference("network.proxy.type", 1)
+        profile.set_preference("network.proxy.http", ProxyHost)
+        profile.set_preference("network.proxy.http_port", int(ProxyPort))
+        profile.update_preferences()
+        return webdriver.Firefox(firefox_profile=profile)
+
+
+
 class AddGroup(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        self.driver = ProxyCh.ChangeProxy(self, ProxyHost, ProxyPort)
+        #self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
         self.base_url = "https://www.katalon.com/"
         self.verificationErrors = []
@@ -67,7 +85,7 @@ class AddGroup(unittest.TestCase):
             self.accept_next_alert = True
 
     def tearDown(self):
-        self.driver.quit()
+        #self.driver.quit()
         self.assertEqual([], self.verificationErrors)
 
 
